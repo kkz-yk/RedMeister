@@ -1,0 +1,27 @@
+# coding: utf-8
+<h1><%= "hoge" %></h1>
+<br>
+<h2>Ticket list </h2>
+
+<table border="1">
+<tr style="background:#ccccff" align="center">
+<td>ID</td> <td>Subject</td> <td>ParentID</td>
+</tr>
+
+<% session[:issues].each do |p| %>
+<tr>
+<% if p != nil %>
+<td>　<%= p["id"] %>　</td>
+<td>　<%= p["subject"] %>　</td>
+<td><% if p["parent"] != nil %>
+　<%= p["parent"] %>　
+<% else %>
+　nil　
+<% end # if p["parent"] != nil %>
+</td>
+<% end # if p != nil %>
+</tr>
+<% end # session[:issues].each do |p| %>
+</table>
+<br><br><br>
+<%= link_to "Back to the Root", root_path %>

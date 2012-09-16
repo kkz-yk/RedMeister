@@ -1,0 +1,2 @@
+module RedminesHelper
+end

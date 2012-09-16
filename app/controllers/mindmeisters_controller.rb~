@@ -1,0 +1,77 @@
+# -*- coding: utf-8 -*-
+class MindmeistersController < ApplicationController
+
+  def mindmeister_top
+  end
+
+  def mindmeister_map
+  end
+
+
+  def getMaps
+    # Get User's Maps
+    session["user_name"] = params[:text_field][:user_name]
+    url_union = "http://www.mindmeister.com/services/rest?api_key=c5f3b0680ba01894d2bf524e13ee1b46&auth_token=Put7sZDH7pprSIs53dKl&method=mm.maps.getChannel&response_format=xml&user=" + session["user_name"]
+    maps_xml = getXML(url_union)
+
+
+    i = 0
+    array = Array.new
+    maps_xml["rsp"]["maps"]["map"].each{ |p|
+      data = Array.new
+      data = [ p["title"].to_s, p["id"].to_i ]
+      array[i] = data
+      i += 1
+    }
+    session[:maps] = array
+
+    redirect_to "/mindmeister_top"
+  end
+
+
+  def getNodes
+    mapID = params[:para]
+    url_union = "http://www.mindmeister.com/services/rest?api_key=c5f3b0680ba01894d2bf524e13ee1b46&auth_token=Put7sZDH7pprSIs53dKl&map_id=" + mapID + "&method=mm.maps.getMap&response_format=xml&api_sig=2b13f3cd5850248a2132057a658dce7b"
+    map_xml = getXML(url_union)
+
+    i = 0
+    array = Array.new
+    map_xml["rsp"]["ideas"]["idea"].each{ |p|
+      data = Hash.new
+      data["id"] = p["id"].to_i
+      data["title"] = p["title"].to_s
+      data["parent"] = p["parent"].to_i
+      array[i] = data
+      i += 1
+    }
+    session[:map] = array
+
+    puts "ああああああああああああ"
+    puts session[:map]
+
+    redirect_to "/mindmeister_map"
+  end
+
+
+  def getXML(url)
+    begin
+      json = Hash.from_xml(open(url))
+      return json
+    rescue SocketError
+      puts "SocketError"
+      exit
+    rescue OpenURI::HTTPError
+      puts "HTTPError: #{url}"
+      exit
+    end
+  end
+
+
+
+  def destroy_
+    reset_session
+    redirect_to "/mindmeister_top"
+  end
+
+
+end

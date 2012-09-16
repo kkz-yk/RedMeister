@@ -1,0 +1,172 @@
+# -*- coding: utf-8 -*-
+require 'oauth'
+
+class MindmeistersController < ApplicationController
+
+  def mindmeister_top
+  end
+
+
+  def mindmeister_map
+  end
+
+
+  def oauth
+#    callback_url = "http://#{request.host_with_port}/callback"
+    callback_url = "http://0.0.0.0:3000/callback"
+
+#    request_token = MindmeistersController.consumer.get_request_token
+    request_token = MindmeistersController.consumer.get_request_token(
+                                                                      :oauth_callback => callback_url
+                                                                      )
+
+
+    session[:request_token] = request_token.token
+    session[:request_token_secret] = request_token.secret
+
+    redirect_to request_token.authorize_url
+  end
+
+
+  def self.consumer
+    OAuth::Consumer.new(
+                        "c5f3b0680ba01894d2bf524e13ee1b46",
+                        "f6b40ef73b79b126",
+                        {
+                          :site => "http://www.mindmeister.com",
+                          :authorize_url => "/services/auth",
+                          :request_token_path => "/services/auth"
+                          #:access_token_path => "/services/auth"
+                        }
+                        )
+  end
+
+
+  def callback
+    puts "ぽぽっぽぽぽぽぽっっっぽぽぽっｐ"
+    consumer = MindmeistersController.consumer
+    request_token = OAuth::RequestToken.new(
+                                            consumer,
+                                            session[:request_token],
+                                            session[:request_token_secret]
+                                            )
+
+    begin
+      access_token = request_token.get_access_token(
+                                                    {},
+                                                    :oauth_token => params[:oauth_token],
+                                                    :oauth_verifier => params[:oauth_verifier]
+                                                    )
+    rescue OAuth::Unauthorized => e
+      RAILS_DEFAULT_LOGGER.error "Failed to get user info via OAuch"
+      flash[:notice] = "Authentication failed"
+
+      redirect_to "/mindmeister_top"
+      return
+    end
+    response = consumer.request(
+                                :get,
+                                '/account/verify_credentials.json',
+                                access_token, { :scheme => :query_string }
+                                )
+    case response
+    when Net::HTTPSuccess
+      @user_info = JSON.parse(response.body)
+      unless @user_info['screen_name']
+        flash[:notice] = "Authentication failed"
+        redirect_to "/mindmeister_top"
+      end
+
+    when Net::HTTPRedirection
+      response = consumer.request(
+                                  :get,
+                                  response['Location'],
+                                  access_token, { :scheme => :header }
+                                  )
+
+    else
+      RAILS_DEFAULT_LOGGER.error "Failed to get user info via OAuth"
+      flash[:notice] = "Authentication failed"
+      redirect_to "/mindmeister_top"
+      return
+    end
+
+    session[:request_token] = nil
+    session[:request_token_secret] = nil
+    session[:oauth] = true
+    session[:oauth_token] = access_token.token
+    session[:oauth_verifier] = access_token.secret
+    redirect_to :mindmeister_top
+  end
+
+
+  def getToken
+    url = "http://www.mindmeister.com/services/auth/?api_key=c5f3b0680ba01894d2bf524e13ee1b46&perms=delete"
+    getXML(url)
+
+
+    redirect_to "/mindmeister_top"
+  end
+
+  def getMaps
+    # Get User's Maps
+    session["user_name"] = params[:text_field][:user_name]
+    url_union = "http://www.mindmeister.com/services/rest?api_key=c5f3b0680ba01894d2bf524e13ee1b46&auth_token=Put7sZDH7pprSIs53dKl&method=mm.maps.getChannel&response_format=xml&user=" + session["user_name"]
+    maps_xml = getXML(url_union)
+
+    array = Array.new
+    maps_xml["rsp"]["maps"]["map"].each{ |p|
+      data = Array.new
+      data = [ p["title"].to_s, p["id"].to_i ]
+      arra.push(data)
+    }
+    session[:maps] = array
+
+    redirect_to "/mindmeister_top"
+  end
+
+
+  def getNodes
+    mapID = params[:para]
+    url_union = "http://www.mindmeister.com/services/rest?api_key=c5f3b0680ba01894d2bf524e13ee1b46&auth_token=Put7sZDH7pprSIs53dKl&map_id=" + mapID + "&method=mm.maps.getMap&response_format=xml&api_sig=2b13f3cd5850248a2132057a658dce7b"
+    map_xml = getXML(url_union)
+
+    array = Array.new
+    map_xml["rsp"]["ideas"]["idea"].each{ |p|
+      data = Hash.new
+      data["id"] = p["id"].to_i
+      data["title"] = p["title"].to_s
+      data["parent"] = p["parent"].to_i
+      array.push(data)
+    }
+    session[:map] = array
+
+    puts "ああああああああああああ"
+    puts session[:map]
+
+    redirect_to "/mindmeister_map"
+  end
+
+
+  def getXML(url)
+    begin
+      json = Hash.from_xml(open(url))
+      return json
+    rescue SocketError
+      puts "SocketError"
+      exit
+    rescue OpenURI::HTTPError
+      puts "HTTPError: #{url}"
+      exit
+    end
+  end
+
+
+
+  def destroy_another
+    reset_session
+    redirect_to "/mindmeister_top"
+  end
+
+
+end

@@ -1,0 +1,2 @@
+module MindmeistersHelper
+end

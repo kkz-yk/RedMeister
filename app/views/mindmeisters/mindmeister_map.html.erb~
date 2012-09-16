@@ -1,0 +1,25 @@
+# coding: utf-8
+<h1>Mindmeister</h1>
+<br>
+<h2>User's Map'</h2>
+
+<table border="1">
+<tr style="background:#ccccff" align="center">
+<td>ID</td> <td>Title</td> <td>ParentID</td>
+</tr>
+
+<% session["map"].each do |p| %>
+<tr>
+<% if p != nil %>
+<td>　<%= p["id"] %>　</td>
+<td>　<%= p["title"] %>　</td>
+<td><% if p["parent"] != nil %>
+　<%= p["parent"] %>　
+<% else %>
+　nil　
+<% end # if p["parent"] != nil %>
+</td>
+<% end # if p != nil %>
+</tr>
+<% end # session[:issues].each do |p| %>
+</table>

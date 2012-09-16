@@ -1,0 +1,6 @@
+class MindemeistersController < ApplicationController
+
+  def mindmeister_top
+  end
+
+end

@@ -1,0 +1,42 @@
+# coding: utf-8
+<h1>Mindmeister</h1>
+
+<% if session["auth_token"] == nil %>
+<%= form_tag ({:controller => 'mindmeisters', :action => :logIn}) do -%>
+<h2>Login</h2>
+<%= submit_tag 'login' %>
+<% end  -%>
+<% end %>
+
+<%= form_tag ({:controller => 'mindmeisters', :action => :destroyAnother}) do -%>
+<%= submit_tag 'Destroy' %>
+<% end -%>
+<br><br>
+
+<% if session["user_name"] == nil %>
+
+<%= form_tag ({:controller => 'mindmeisters', :action => :getMaps}) do -%>
+<h2>Please Input Mindmeister User Name</h2>
+　　<%= text_field_tag 'text_field[user_name]', '', :size => 80 %>
+<%= submit_tag 'Send' %>
+<% end  -%>
+
+<% else %>
+
+
+<table border="1">
+<tr style="background:#ccccff" align="center">
+
+<h2><%= session["user_name"] %>'s Maps list </h2>
+<% session[:maps].each do |p| %>
+<% if p != nil %>
+<tr><td>
+<%= link_to p["title"], :cotroller => :mindmeisters, :action => :getNodes, :title => p["title"] ,:id => p["id"] %><br>
+</td></tr>
+<% end %>
+<% end %>
+<% end %>
+</table>
+
+<br><br><br>
+<%= link_to "Back to the Root", root_path %>

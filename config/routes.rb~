@@ -1,0 +1,16 @@
+RedMeister::Application.routes.draw do
+  get "welcomes/index"
+  root :to => "welcomes#index"
+
+  match "/redmine_top" => "redmines#redmine_top", :as => :redmine_top
+  match "/send_url" => "redmines#send_url", :as => :send_url
+  match "/getIssues" => "redmines#getIssues", :as => :getIssues
+  match "/redmine_post" => "redmines#redmine_post", :as => :redmine_post
+  match "/destroy" => "redmines#destroy", :as => :destroy
+
+  match "/mindmeister_top" => "mindmeisters#mindmeister_top", :as => :mindmeister_top
+  match "/getMaps" => "mindmeisters#getMaps", :as => :getMaps
+  match "/getNodes" => "mindmeisters#getNodes", :as => :getNodes
+  match "/mindmeister_map" => "mindmeisters#mindmeister_map", :as => :mindmeister_map
+  match "/destroy_another" => "mindmeisters#destroy_another", :as => :destroy_another
+end

@@ -1,0 +1,26 @@
+# coding: utf-8
+<h1>Mindmeister_top</h1>
+
+<%= form_tag ({:controller => 'mindmeisters', :action => :destroy_another}) do -%>
+<%= submit_tag 'Destroy' %>
+<% end -%>
+<br><br>
+
+<% if session["user_name"] == nil %>
+
+<%= form_tag ({:controller => 'mindmeisters', :action => :getMaps}) do -%>
+<h2>Please Input Mindmeister User Name</h2>
+　　<%= text_field_tag 'text_field[user_name]', '', :size => 80 %>
+<%= submit_tag 'Send' %>
+<% end  -%>
+
+<% else %>
+
+<h2>Maps list </h2>
+<% session[:maps].each do |p| %>
+<% if p != nil %>
+<%= link_to p[0], :cotroller => :mindmeisters, :action => :getNodes, :para => p[1] %><br>
+<% end %>
+<% end %>
+
+<% end %>
