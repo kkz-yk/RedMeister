@@ -1,24 +1,8 @@
 # coding: utf-8
-<h1>Redmine Top</h1>
+<h1>Redmine Project List</h1>
 <br>
 
-
-<%= form_tag ({:controller => 'redmines', :action => :destroy}) do -%>
-<%= submit_tag 'Destroy' %>
-<% end -%>
-<br><br>
-
-<% if session["r_url"] == nil %>
-
-<%= form_tag ({:controller => 'redmines', :action => :getProjects}) do -%>
-<h2>Please Input Redmine Server URL</h2>
-　　<%= text_field_tag 'text_field[r_url]', '', :size => 80 %>
-<%= submit_tag 'Send' %>
-<% end  -%>
-
-<% else %>
-
-<h2>Projects list </h2>
+<% if session["r_url"] != nil %>
 <% session[:projects].each do |p| %>
 <% if p != nil %>
 <%= link_to p[0], :cotroller => :redmines, :action => :getIssues, :para => p[1] %><br>

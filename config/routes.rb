@@ -6,6 +6,8 @@ RedMeister::Application.routes.draw do
   match "/getProjects" => "redmines#getProjects", :as => :getProjects
   match "/getIssues" => "redmines#getIssues", :as => :getIssues
   match "/redmine_project" => "redmines#redmine_project", :as => :redmine_project
+  match "/postToMindmeister" => "redmines#postToMindmeister", :as => :postToMindmeister
+
   match "/destroy" => "redmines#destroy", :as => :destroy
 
 
@@ -13,9 +15,9 @@ RedMeister::Application.routes.draw do
   match "/logIn" => "mindmeisters#logIn", :as => :logIn
   match "/callback" => "mindmeisters#callback", :as => :callback
   match "/getToken" => "mindmeisters#getToken", :as => :getToken
-  match "/getMaps" => "mindmeisters#getMaps", :as => :getMaps
-  match "/getNodes" => "mindmeisters#getNodes", :as => :getNodes
+  match "/getChannel" => "mindmeisters#getChannel", :as => :getChannel
+  match "/getMap" => "mindmeisters#getMap", :as => :getMap
+  match "/postToRedmine" => "mindmeisters#postToRedmine", :as => :postToRedmine
   match "/mindmeister_map" => "mindmeisters#mindmeister_map", :as => :mindmeister_map
-  match "/destroyAnother" => "mindmeisters#destroyAnother", :as => :destroyAnother
 
 end

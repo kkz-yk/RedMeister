@@ -28,7 +28,7 @@ class MindmeistersController < ApplicationController
       session["auth_token"] = getToken(frob)
     end
 
-    redirect_to "/mindmeister_top"
+    redirect_to root_path
   end
 
 
@@ -84,7 +84,7 @@ class MindmeistersController < ApplicationController
   end
 
 
-  def getMaps
+  def getChannel
     # Get Maps of User
     session["user_name"] = params[:text_field][:user_name]
     url = "http://www.mindmeister.com/services/rest?api_key=" + $api_key + "&auth_token=" + session["auth_token"] + "&method=mm.maps.getChannel&response_format=xml&user=" + session["user_name"]
@@ -116,7 +116,7 @@ class MindmeistersController < ApplicationController
   end
 
 
-  def getNodes
+  def getMap
     # Get Nodes of Map
     session["map_title"] = params[:title]
     session["map_id"] = params[:id]
@@ -127,16 +127,17 @@ class MindmeistersController < ApplicationController
 
     map_xml = getXML(_url)
 
-    puts "ほげほげほげほげ"
-    puts map_xml
-
     array = Array.new
     begin
       map_xml["rsp"]["ideas"]["idea"].each{ |p|
         data = Hash.new
         data["id"] = p["id"].to_i
         data["title"] = p["title"].to_s
-        data["parent"] = p["parent"].to_i
+        data["parent_id"] = p["parent"].to_i
+        data["parent_name"] = "root"
+        data["parent_issue_id"] = "nil"
+        data["flag"] = "post"
+        data["issue_id"] = "nil"
         array.push(data)
       }
     rescue
@@ -144,10 +145,80 @@ class MindmeistersController < ApplicationController
       data = Hash.new
       data["id"] = map["id"].to_i
       data["title"] = map["title"].to_s
-      data["parent"] = map["parent"].to_i
+      data["parent_id"] = map["parent"].to_i
+      data["parent_name"] = "root"
+      data["parent_issue_id"] = "nil"
+      data["flag"] = "post"
+      data["issue_id"] = "nil"
       array.push(data)
     end
     session[:map] = array
+
+    redirect_to "/mindmeister_map"
+  end
+
+
+  def postToRedmine
+    array = session[:map]
+    root_id = 0
+
+    array.each{ |p1|
+      puts p1["id"]
+      if p1["parent_id"].to_i == 0
+        root_id = p1["id"]
+        p1["flag"] = "nil"
+      else
+        if p1["parent_id"] != root_id
+          array.each{ |p2|
+            if p1["parent_id"] == p2["id"]
+              p1["parent_name"] = p2["title"]
+              break
+            end
+          }
+        end
+      end
+    }
+
+
+    # Compare subject of Redmine with title of Mindmeister
+    issues = Issue.find(:all)
+
+    array.each{ |p1|
+      issues.each{ |p2|
+        if p1["parent_name"] == p2.subject
+          p1["parent_issue_id"] = p2.id
+        end
+        if p1["title"] == p2.subject
+          p1["flag"] = "nil"
+        end
+      }
+    }
+
+    # Createing an issue
+    array.each{ |p1|
+      if p1['flag'] == "post"
+        if p1['parent_name'] != "root" && p1['parent_issue_id'] == "nil"
+          array.each{ |p2|
+            if p1['parent_name'] == p2['title']
+              p1['parent_issue_id'] = p2['issue_id']
+              break
+            end
+          }
+        end
+
+        issue = Issue.new(
+                          :parent_issue_id => p1['parent_issue_id'],
+                          :subject => p1['title'],
+                          :project_id => 56
+                          )
+        if issue.save
+          puts issue.id
+          p1['issue_id'] = issue.id
+        else
+          puts "failed create ticket from Mindmeister"
+        end
+      end
+    }
 
     redirect_to "/mindmeister_map"
   end
@@ -176,9 +247,12 @@ class MindmeistersController < ApplicationController
     return md5
   end
 
+end
 
-  def destroyAnother
-    reset_session
-    redirect_to "/mindmeister_top"
-  end
+
+# REDMINE REST API
+class Issue < ActiveResource::Base
+  self.site = 'http://redmine.ie.u-ryukyu.ac.jp/projects/pro3-2012-redmine'
+  self.format = :xml
+  self.headers['X-Redmine-API-Key'] = "b5f08149773145e8566e6eac51e4ce729a5f233e"
 end

@@ -23,5 +23,11 @@
 </tr>
 <% end # session[:issues].each do |p| %>
 </table>
+<br><br>
+
+<%= form_tag ({:controller => 'redmines', :action => :postToMindmeister}) do -%>
+<%= submit_tag 'Post from Redmine to Mindmeister' %>
+<% end -%>
+
 <br><br><br>
 <%= link_to "Back to the Root", root_path %>

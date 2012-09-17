@@ -11,8 +11,8 @@
 <% if p != nil %>
 <td>　<%= p["id"] %>　</td>
 <td>　<%= p["title"] %>　</td>
-<td><% if p["parent"] != nil %>
-　<%= p["parent"] %>　
+<td><% if p["parent_id"] != nil %>
+　<%= p["parent_id"] %>　
 <% else %>
 　nil　
 <% end # if p["parent"] != nil %>
@@ -21,5 +21,9 @@
 </tr>
 <% end # session[:issues].each do |p| %>
 </table>
+<br><br><br>
+<%= form_tag ({:controller => 'mindmeisters', :action => :postToRedmine}) do -%>
+<%= submit_tag 'Post from Mindmeister to Redmine' %>
+<% end -%>
 <br><br><br>
 <%= link_to "Back to the Root", root_path %>

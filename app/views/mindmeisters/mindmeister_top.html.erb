@@ -1,20 +1,7 @@
 # coding: utf-8
 <h1>Mindmeister</h1>
 
-<% if session["auth_token"] == nil %>
-<%= form_tag ({:controller => 'mindmeisters', :action => :logIn}) do -%>
-<h2>Login</h2>
-<%= submit_tag 'login' %>
-<% end  -%>
-<% end %>
-
-<%= form_tag ({:controller => 'mindmeisters', :action => :destroyAnother}) do -%>
-<%= submit_tag 'Destroy' %>
-<% end -%>
-<br><br>
-
-
-<%= form_tag ({:controller => 'mindmeisters', :action => :getMaps}) do -%>
+<%= form_tag ({:controller => 'mindmeisters', :action => :getChannel}) do -%>
 <h2>Please Input Mindmeister User Name</h2>
 　　<%= text_field_tag 'text_field[user_name]', '', :size => 80 %>
 <%= submit_tag 'Send' %>
@@ -28,7 +15,7 @@
 <% session[:maps].each do |p| %>
 <% if p != nil %>
 <tr><td>
-<%= link_to p["title"], :cotroller => :mindmeisters, :action => :getNodes, :title => p["title"] ,:id => p["id"] %><br>
+<%= link_to p["title"], :cotroller => :mindmeisters, :action => :getMap, :title => p["title"] ,:id => p["id"] %><br>
 </td></tr>
 <% end %>
 <% end %>
