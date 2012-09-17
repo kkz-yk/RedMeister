@@ -2,7 +2,6 @@ source 'https://rubygems.org'
 
 gem 'rails', '3.2.3'
 gem 'core_ext'
-gem 'oauth'
 gem 'debugger'
 
 # Bundle edge Rails instead:
@@ -13,7 +12,7 @@ gem 'sqlite3'
 group :production do
     gem 'execjs'
     gem 'therubyracer'
-end 
+end
 
 
 # Gems used only for assets and not required

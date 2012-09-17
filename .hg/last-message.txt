@@ -1,1 +1,1 @@
-Get auth_token
+Improve method 'getMaps' and 'getNodes'

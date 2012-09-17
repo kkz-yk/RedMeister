@@ -13,17 +13,14 @@
 <% end -%>
 <br><br>
 
-<% if session["user_name"] == nil %>
 
 <%= form_tag ({:controller => 'mindmeisters', :action => :getMaps}) do -%>
 <h2>Please Input Mindmeister User Name</h2>
 　　<%= text_field_tag 'text_field[user_name]', '', :size => 80 %>
 <%= submit_tag 'Send' %>
-<% end  -%>
+<% end -%>
 
-<% else %>
-
-
+<% if session["user_name"] != nil %>
 <table border="1">
 <tr style="background:#ccccff" align="center">
 

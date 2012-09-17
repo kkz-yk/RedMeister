@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'open-uri'
 require 'active_support/core_ext'
-require 'oauth'
 require 'digest/md5'
 
 class MindmeistersController < ApplicationController
@@ -56,6 +55,7 @@ class MindmeistersController < ApplicationController
     api_sig = md5Converter(str)
     _url = url + "&api_sig=" + api_sig
 
+
     redirect_to _url
   end
 
@@ -94,13 +94,22 @@ class MindmeistersController < ApplicationController
 
     maps_xml = getXML(_url)
 
-    array = Array.new
-    maps_xml["rsp"]["maps"]["map"].each{ |p|
+    begin
+      array = Array.new
+      maps_xml["rsp"]["maps"]["map"].each{ |p|
+        data = Hash.new
+        data["title"] = p["title"].to_s
+        data["id"] = p["id"].to_i
+        array.push(data)
+      }
+    rescue
+      array = Array.new
+      maps = maps_xml["rsp"]["maps"]["map"]
       data = Hash.new
-      data["title"] = p["title"].to_s
-      data["id"] = p["id"].to_i
+      data["title"] = maps["title"].to_s
+      data["id"] = maps["id"].to_i
       array.push(data)
-    }
+    end
     session[:maps] = array
 
     redirect_to "/mindmeister_top"
@@ -118,14 +127,26 @@ class MindmeistersController < ApplicationController
 
     map_xml = getXML(_url)
 
+    puts "ほげほげほげほげ"
+    puts map_xml
+
     array = Array.new
-    map_xml["rsp"]["ideas"]["idea"].each{ |p|
+    begin
+      map_xml["rsp"]["ideas"]["idea"].each{ |p|
+        data = Hash.new
+        data["id"] = p["id"].to_i
+        data["title"] = p["title"].to_s
+        data["parent"] = p["parent"].to_i
+        array.push(data)
+      }
+    rescue
+      map = map_xml["rsp"]["ideas"]["idea"]
       data = Hash.new
-      data["id"] = p["id"].to_i
-      data["title"] = p["title"].to_s
-      data["parent"] = p["parent"].to_i
+      data["id"] = map["id"].to_i
+      data["title"] = map["title"].to_s
+      data["parent"] = map["parent"].to_i
       array.push(data)
-    }
+    end
     session[:map] = array
 
     redirect_to "/mindmeister_map"
