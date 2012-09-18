@@ -149,11 +149,12 @@ class MindmeistersController < ApplicationController
       array.push(data)
     end
     @map = array
+    session["map"] = @map
   end
 
 
   def postToRedmine
-    array = session[:map]
+    array = session["map"]
     root_id = 0
 
     array.each{ |p1|
@@ -203,7 +204,8 @@ class MindmeistersController < ApplicationController
         issue = Issue.new(
                           :parent_issue_id => p1['parent_issue_id'],
                           :subject => p1['title'],
-                          :project_id => 56
+                          #:project_id => 56
+                          :project_id => 57
                           )
         if issue.save
           puts issue.id
@@ -214,7 +216,7 @@ class MindmeistersController < ApplicationController
       end
     }
 
-    redirect_to "/mindmeister_map"
+    redirect_to root_path
   end
 
 end
@@ -222,7 +224,10 @@ end
 
 # REDMINE REST API
 class Issue < ActiveResource::Base
-  self.site = 'http://redmine.ie.u-ryukyu.ac.jp/projects/pro3-2012-redmine'
+#  self.site = 'http://redmine.ie.u-ryukyu.ac.jp/projects/pro3-2012-redmine'
+  self.site = 'http://redmine.ie.u-ryukyu.ac.jp/projects/pro3-test'
   self.format = :xml
-  self.headers['X-Redmine-API-Key'] = "b5f08149773145e8566e6eac51e4ce729a5f233e"
+#  self.headers['X-Redmine-API-Key'] = "b5f08149773145e8566e6eac51e4ce729a5f233e"
+  self.headers['X-Redmine-API-Key'] = "4daf4407c57f9481cd535656da21b1ae00c00d2a
+"
 end

@@ -1,5 +1,5 @@
 # coding: utf-8
-<h1>【各AppにLoginしてくれ】</h1>
+<h1>【Loginしてくれ】</h1>
 
 <h2>- Mindmeister -</h2>
 <% if session["auth_token"] == nil %>
@@ -7,7 +7,7 @@
 <%= submit_tag 'Mindmeister Login' %>
 <% end  -%>
 <% else %>
-Mindmeisterでログインなう
+Mindmeisterで認証ok
 <br><br>
 <% end %>
 <br>
