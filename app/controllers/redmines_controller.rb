@@ -8,25 +8,34 @@ class RedminesController < ApplicationController
   $api_key = RedMeister::Application.config.api_key
   $api_secret = RedMeister::Application.config.api_secret
 
-  def getProjects
-    if params[:text_field]
-    session["r_user_name"] = params[:text_field][:r_user_name]
-    session["r_password"] = params[:text_field][:r_password]
-    session["r_url"] = params[:text_field][:r_url]
+  def inputInfo
+    if ((params[:text_field][:r_user_name] != "") && (params[:text_field][:r_password] != "") &&  (params[:text_field][:r_url] != ""))
+      session["r_user_name"] = params[:text_field][:r_user_name]
+      session["r_password"] = params[:text_field][:r_password]
+      session["r_url"] = params[:text_field][:r_url]
     end
 
-    # Acquire Redmine Projects
-    url_union = session["r_url"] + "/projects.xml?"
-    projects_xml = getXML(url_union)
+    redirect_to root_path
+  end
 
-    array = Array.new
-    projects_xml["projects"].each{ |p|
-      data = Array.new
-      data = [ p["name"].to_s, p["identifier"].to_s ]
-      array.push(data)
-    }
-    @projects = array
-    session["projects"] = @projects
+
+  def getProjects
+    if (session["r_user_name"] == nil) || (session["r_password"] == nil) ||  (session["r_url"] == nil)
+      redirect_to root_path
+    else
+      # Acquire Redmine Projects
+      url_union = session["r_url"] + "/projects.xml?"
+      projects_xml = getXML(url_union)
+
+      array = Array.new
+      projects_xml["projects"].each{ |p|
+        data = Array.new
+        data = [ p["name"].to_s, p["identifier"].to_s ]
+        array.push(data)
+      }
+      @projects = array
+      session["projects"] = @projects
+    end # if(session["r_user_name]" ~
   end
 
 

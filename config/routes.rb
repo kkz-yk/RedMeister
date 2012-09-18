@@ -2,6 +2,7 @@ RedMeister::Application.routes.draw do
   get "welcomes/index"
   root :to => "welcomes#index"
 
+  match "/inputInfo" => "redmines#inputInfo", :as => :inputInfo
   match "/getProjects" => "redmines#getProjects", :as => :getProjects
   match "/getIssues" => "redmines#getIssues", :as => :getIssues
   match "/postToMindmeister" => "redmines#postToMindmeister", :as => :postToMindmeister
