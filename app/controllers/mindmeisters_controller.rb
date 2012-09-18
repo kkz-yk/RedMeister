@@ -55,7 +55,6 @@ class MindmeistersController < ApplicationController
     api_sig = md5Converter(str)
     _url = url + "&api_sig=" + api_sig
 
-
     redirect_to _url
   end
 
@@ -94,8 +93,8 @@ class MindmeistersController < ApplicationController
 
     maps_xml = getXML(_url)
 
+    array = Array.new
     begin
-      array = Array.new
       maps_xml["rsp"]["maps"]["map"].each{ |p|
         data = Hash.new
         data["title"] = p["title"].to_s
@@ -103,16 +102,13 @@ class MindmeistersController < ApplicationController
         array.push(data)
       }
     rescue
-      array = Array.new
       maps = maps_xml["rsp"]["maps"]["map"]
       data = Hash.new
       data["title"] = maps["title"].to_s
       data["id"] = maps["id"].to_i
       array.push(data)
     end
-    session[:maps] = array
-
-    redirect_to "/mindmeister_top"
+    @channel = array
   end
 
 
@@ -152,9 +148,8 @@ class MindmeistersController < ApplicationController
       data["issue_id"] = "nil"
       array.push(data)
     end
-    session[:map] = array
+    @map = array
 
-    redirect_to "/mindmeister_map"
   end
 
 

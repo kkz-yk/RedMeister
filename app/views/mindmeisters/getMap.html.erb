@@ -1,0 +1,29 @@
+# coding: utf-8
+<h2> <%= session["map_title"] %> </h2>
+
+<table border="1">
+<tr style="background:#ccccff" align="center">
+<td>ID</td> <td>Title</td> <td>ParentID</td>
+</tr>
+
+<% @map.each do |p| %>
+<tr>
+<% if p != nil %>
+<td>　<%= p["id"] %>　</td>
+<td>　<%= p["title"] %>　</td>
+<td><% if p["parent_id"] != nil %>
+　<%= p["parent_id"] %>　
+<% else %>
+　nil　
+<% end # if p["parent"] != nil %>
+</td>
+<% end # if p != nil %>
+</tr>
+<% end # session[:issues].each do |p| %>
+</table>
+<br><br><br>
+<%= form_tag ({:controller => 'mindmeisters', :action => :postToRedmine}) do -%>
+<%= submit_tag 'Post from Mindmeister to Redmine' %>
+<% end -%>
+<br><br><br>
+<%= link_to "Back to the Root", root_path %>

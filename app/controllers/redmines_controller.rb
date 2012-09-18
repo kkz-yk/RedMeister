@@ -10,12 +10,6 @@ class RedminesController < ApplicationController
   $api_key = RedMeister::Application.config.api_key
   $api_secret = RedMeister::Application.config.api_secret
 
-  def redmine_top
-  end
-
-  def redmine_project
-  end
-
   def getProjects
     session["r_user_name"] = params[:text_field][:r_user_name]
     session["r_password"] = params[:text_field][:r_password]
@@ -32,15 +26,14 @@ class RedminesController < ApplicationController
       puts data[1]
       array.push(data)
     }
-    session["projects"] = array
-
-    redirect_to root_path
+    @projects = array
   end
 
 
   def getIssues
-    @para = params[:para]
-    url_union = session["r_url"] + "/projects/" + @para +  "/issues.xml"
+    @project_name = params[:project_name]
+    project_id = params[:project_id]
+    url_union = session["r_url"] + "/projects/" + project_id +  "/issues.xml"
     issues_xml = getXML(url_union)
 
     array = Array.new
@@ -56,9 +49,7 @@ class RedminesController < ApplicationController
 
       array.push(data)
     }
-    session["issues"] = array
-
-    redirect_to "/redmine_project"
+    @issues = array
   end
 
   $map_id = 205113896

@@ -1,0 +1,13 @@
+# coding: utf-8
+<h1>Redmine Project List</h1>
+<br>
+
+<% if session["r_url"] != nil %>
+<% @projects.each do |p| %>
+<% if p != nil %>
+<%= link_to p[0], :cotroller => :redmines, :action => :getIssues, :project_name => p[0],:project_id => p[1] %><br>
+<% end %>
+<% end %>
+<% end %>
+<br><br><br>
+<%= link_to "Back to the Root", root_path %>

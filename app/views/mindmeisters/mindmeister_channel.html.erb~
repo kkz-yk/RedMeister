@@ -1,0 +1,24 @@
+# coding: utf-8
+<h1>Mindmeister</h1>
+
+<% if session["user_name"] == nil %>
+
+<% else %>
+<table border="1">
+<tr style="background:#ccccff" align="center">
+
+<h2><%= session["user_name"] %>'s Maps list </h2>
+<% puts "ああああああああああああ" %>
+<% puts @hoge %>
+<% @maps.each do |p| %>
+<% if p != nil %>
+<tr><td>
+<%= link_to p["title"], :cotroller => :mindmeisters, :action => :getMap, :title => p["title"] ,:id => p["id"] %><br>
+</td></tr>
+<% end %>
+<% end %>
+<% end %>
+</table>
+
+<br><br><br>
+<%= link_to "Back to the Root", root_path %>
