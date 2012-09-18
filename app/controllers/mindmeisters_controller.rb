@@ -33,7 +33,7 @@ class MindmeistersController < ApplicationController
 
 
   def getFrob
-    url = "http://www.mindmeister.com/services/rest?api_key=" + $api_key + "&method=mm.auth.getFrob&response_format=xml"
+    url = "http://www.mindmeister.com/services/rest?api_key={$api_key}&method=mm.auth.getFrob&response_format=xml"
     str = url.clone
 
     api_sig = md5Converter(str)
@@ -45,7 +45,7 @@ class MindmeistersController < ApplicationController
 
 
   def createToken
-    url = "http://www.mindmeister.com/services/auth/?api_key=" + $api_key + "&perms=delete"
+    url = "http://www.mindmeister.com/services/auth/?api_key=#{$api_key}&perms=delete"
     str = url.clone
 
     str.slice!("http://www.mindmeister.com/services/auth/?")
@@ -60,7 +60,7 @@ class MindmeistersController < ApplicationController
 
 
   def getToken(frob)
-    url = "http://www.mindmeister.com/services/rest?api_key=" + $api_key + "&frob=" + frob + "&method=mm.auth.getToken&response_format=xml"
+    url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&frob=#{frob}&method=mm.auth.getToken&response_format=xml"
     str = url.clone
 
     api_sig = md5Converter(str)
@@ -72,7 +72,7 @@ class MindmeistersController < ApplicationController
 
 
   def checkToken
-    url = "http://www.mindmeister.com/services/rest?api_key=" + $api_key + "&auth_token=" + session["auth_token"] + "&method=mm.auth.checkToken&response_format=xml"
+    url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&method=mm.auth.checkToken&response_format=xml"
     str = url.clone
 
     api_sig = md5Converter(str)
@@ -86,7 +86,7 @@ class MindmeistersController < ApplicationController
   def getChannel
     # Get Maps of User
     session["user_name"] = params[:text_field][:user_name]
-    url = "http://www.mindmeister.com/services/rest?api_key=" + $api_key + "&auth_token=" + session["auth_token"] + "&method=mm.maps.getChannel&response_format=xml&user=" + session["user_name"]
+    url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&method=mm.maps.getChannel&response_format=xml&user=#{session["user_name"]}"
     str = url.clone
     api_sig = md5Converter(str)
     _url = url + "&api_sig=" + api_sig
@@ -116,7 +116,7 @@ class MindmeistersController < ApplicationController
     # Get Nodes of Map
     session["map_title"] = params[:title]
     session["map_id"] = params[:id]
-    url = "http://www.mindmeister.com/services/rest?api_key=" + $api_key + "&auth_token=" + session["auth_token"] + "&map_id=" + session["map_id"] + "&method=mm.maps.getMap&response_format=xml"
+    url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&map_id=#{session["map_id"]}&method=mm.maps.getMap&response_format=xml"
     str = url.clone
     api_sig = md5Converter(str)
     _url = url + "&api_sig=" + api_sig
@@ -149,7 +149,6 @@ class MindmeistersController < ApplicationController
       array.push(data)
     end
     @map = array
-
   end
 
 
@@ -216,30 +215,6 @@ class MindmeistersController < ApplicationController
     }
 
     redirect_to "/mindmeister_map"
-  end
-
-
-  def getXML(url)
-    begin
-      xml = Hash.from_xml(open(url))
-      return xml
-    rescue SocketError
-      puts "SocketError"
-      exit
-    rescue OpenURI::HTTPError
-      puts "HTTPError: #{url}"
-      exit
-    end
-  end
-
-
-  def md5Converter(str)
-    str.slice!("http://www.mindmeister.com/services/rest?")
-    str.delete!("=")
-    str.delete!("&")
-
-    md5 = Digest::MD5.hexdigest($api_secret  + str)
-    return md5
   end
 
 end
