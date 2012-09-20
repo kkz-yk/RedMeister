@@ -8,6 +8,7 @@ class MindmeistersController < ApplicationController
   $api_key = RedMeister::Application.config.api_key
   $api_secret = RedMeister::Application.config.api_secret
 
+
   def mindmeister_top
   end
 
@@ -34,9 +35,8 @@ class MindmeistersController < ApplicationController
 
   def getFrob
     url = "http://www.mindmeister.com/services/rest?api_key={$api_key}&method=mm.auth.getFrob&response_format=xml"
-    str = url.clone
 
-    api_sig = md5Converter(str)
+    api_sig = md5Converter(url)
     _url = url + "&api_sig=" + api_sig
 
     xml = getXML(_url)
@@ -46,13 +46,8 @@ class MindmeistersController < ApplicationController
 
   def createToken
     url = "http://www.mindmeister.com/services/auth/?api_key=#{$api_key}&perms=delete"
-    str = url.clone
 
-    str.slice!("http://www.mindmeister.com/services/auth/?")
-    str.delete!("=")
-    str.delete!("&")
-
-    api_sig = md5Converter(str)
+    api_sig = md5Converter(url)
     _url = url + "&api_sig=" + api_sig
 
     redirect_to _url
@@ -61,9 +56,8 @@ class MindmeistersController < ApplicationController
 
   def getToken(frob)
     url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&frob=#{frob}&method=mm.auth.getToken&response_format=xml"
-    str = url.clone
 
-    api_sig = md5Converter(str)
+    api_sig = md5Converter(url)
     _url = url + "&api_sig=" + api_sig
 
     xml = getXML(_url)
@@ -73,9 +67,8 @@ class MindmeistersController < ApplicationController
 
   def checkToken
     url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&method=mm.auth.checkToken&response_format=xml"
-    str = url.clone
 
-    api_sig = md5Converter(str)
+    api_sig = md5Converter(url)
     _url = url + "&api_sig=" + api_sig
 
     xml = getXML(_url)
@@ -87,8 +80,8 @@ class MindmeistersController < ApplicationController
     # Get Maps of User
     session["user_name"] = params[:text_field][:user_name]
     url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&method=mm.maps.getChannel&response_format=xml&user=#{session["user_name"]}"
-    str = url.clone
-    api_sig = md5Converter(str)
+
+    api_sig = md5Converter(url)
     _url = url + "&api_sig=" + api_sig
 
     maps_xml = getXML(_url)
@@ -117,8 +110,8 @@ class MindmeistersController < ApplicationController
     session["map_title"] = params[:title]
     session["map_id"] = params[:id]
     url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&map_id=#{session["map_id"]}&method=mm.maps.getMap&response_format=xml"
-    str = url.clone
-    api_sig = md5Converter(str)
+
+    api_sig = md5Converter(url)
     _url = url + "&api_sig=" + api_sig
 
     map_xml = getXML(_url)
@@ -176,6 +169,8 @@ class MindmeistersController < ApplicationController
 
 
     # Compare subject of Redmine with title of Mindmeister
+    $r_user = session["r_user"]
+    $r_password = session["r_password"]
     issues = Issue.find(:all)
 
     array.each{ |p1|
@@ -227,7 +222,6 @@ class Issue < ActiveResource::Base
 #  self.site = 'http://redmine.ie.u-ryukyu.ac.jp/projects/pro3-2012-redmine'
   self.site = 'http://redmine.ie.u-ryukyu.ac.jp/projects/pro3-test'
   self.format = :xml
-#  self.headers['X-Redmine-API-Key'] = "b5f08149773145e8566e6eac51e4ce729a5f233e"
-  self.headers['X-Redmine-API-Key'] = "4daf4407c57f9481cd535656da21b1ae00c00d2a
-"
+  self.user = $r_user
+  self.password = $r_password
 end

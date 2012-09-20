@@ -26,7 +26,9 @@ class ApplicationController < ActionController::Base
     redirect_to root_path
   end
 
-  def md5Converter(str)
+  def md5Converter(url)
+    str = url.clone
+
     str.slice!("http://www.mindmeister.com/services/rest?")
     str.delete!("=")
     str.delete!("&")
@@ -38,9 +40,8 @@ class ApplicationController < ActionController::Base
 
   def addMap
     url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&method=mm.maps.add&response_format=xml"
-    str = url.clone
 
-    api_sig = md5Converter(str)
+    api_sig = md5Converter(url)
     _url = url + "&api_sig=" + api_sig
 
     xml = getXML(_url)
@@ -50,9 +51,8 @@ class ApplicationController < ActionController::Base
 
   def publishMap(map_id)
     url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&map_id=#{map_id.to_s}&method=mm.maps.publish&response_format=xml"
-    str = url.clone
 
-    api_sig = md5Converter(str)
+    api_sig = md5Converter(url)
     _url = url + "&api_sig=" + api_sig
 
     xml = getXML(_url)
@@ -62,9 +62,8 @@ class ApplicationController < ActionController::Base
 
   def changeIdeas(map_id, project_name)
     url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&idea_id=#{map_id.to_s}&map_id=#{map_id.to_s}&method=mm.ideas.change&response_format=xml&title=#{project_name}"
-    str = url.clone
 
-    api_sig = md5Converter(str)
+    api_sig = md5Converter(url)
     _url = url + "&api_sig=" + api_sig
     uri = URI.escape(_url)
 

@@ -73,8 +73,8 @@ class RedminesController < ApplicationController
     array.each{ |array_tmp|
       puts array_tmp
       url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&map_id=#{mindmeister_map["id"]}&method=mm.ideas.insert&parent_id=#{mindmeister_map["id"]}&response_format=xml&title=#{array_tmp["subject"]}&x_pos=200&y_pos=0"
-      str = url.clone
-      api_sig = md5Converter(str)
+
+      api_sig = md5Converter(url)
       _url = url + "&api_sig=" + api_sig
 
       uri = URI.escape(_url)
