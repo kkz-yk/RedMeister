@@ -1,0 +1,13 @@
+class CreateIdRoots < ActiveRecord::Migration
+  def change
+    create_table :id_roots do |t|
+      t.integer :project_id
+      t.integer :map_id
+
+      t.timestamps
+    end
+
+#    add_index :redmine_tables, [ :id, :project_id ], unique: true
+#    add_index :mindmeister_tables, [ :id, :map_id ], unique: true
+  end
+end

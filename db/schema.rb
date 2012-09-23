@@ -11,13 +11,30 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120921064623) do
+ActiveRecord::Schema.define(:version => 20120923115028) do
+
+  create_table "id_roots", :force => true do |t|
+    t.integer  "project_id"
+    t.integer  "map_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "infos", :force => true do |t|
     t.string   "user_name_d"
     t.string   "password_d"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
+  end
+
+  create_table "mindmeister_tables", :force => true do |t|
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "redmine_tables", :force => true do |t|
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "sessions", :force => true do |t|
