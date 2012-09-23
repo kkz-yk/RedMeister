@@ -1,0 +1,15 @@
+# coding: utf-8
+<h1>RedMeister  - Sign up -</h1>
+<font size="4" color="red"><%= flash[:alert] %></font>
+
+<%= form_tag ({:controller => 'welcomes', :action => :signUp}) do -%>
+<p id="paragraph">User Name</p><%= text_field_tag 'text_field[user_name]', '', :size => 40, :id => "input_area" %><br>
+<p id="paragraph">Password</p><%= password_field_tag 'text_field[password]', '', :size => 40, :id => "input_area" %>
+<p id="paragraph">Confirm Password</p><%= password_field_tag 'text_field[conf_pass]', '', :size => 40, :id => "input_area" %><br><br><br>
+
+<%= submit_tag 'Sign up' %>
+<% end  -%>
+
+<br><br><br><br>
+
+<%= link_to "Login Page", "/gate" %>

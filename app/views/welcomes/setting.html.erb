@@ -1,0 +1,32 @@
+# coding: utf-8
+<h1>Authentication</h1>
+
+<h2>- Mindmeister -</h2>
+<% if session["auth_token"] == nil %>
+<%= form_tag ({:controller => 'mindmeisters', :action => :logIn:}) do -%>
+<%= submit_tag 'Login' %>
+<% end -%>
+
+<% else %>
+  Mindmeister Login.
+<% end %>
+<br>
+<br>
+<br>
+
+
+<h2>- Redmine -</h2>
+<%= form_tag ({:controller => 'redmines', :action => :inputInfo}) do -%>
+<p id="paragraph">Server URL</p>
+　　<%= text_field_tag 'text_field[r_url]', '', :size => 300, :id => "input_area" %><br>
+<p id="paragraph">User Name</p>
+　　<%= text_field_tag 'text_field[r_user_name]', '', :size => 150, :id => "input_area" %><br>
+<p id="paragraph">Password</p>
+　　<%= password_field_tag 'text_field[r_password]', '', :size => 150, :id => "input_area" %><br>
+<br>
+<%= submit_tag 'Send' %>
+<% end  -%>
+
+
+<br><br>
+<h3><%= link_to "Top Page", "/index" %></h3>

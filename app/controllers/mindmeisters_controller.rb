@@ -12,6 +12,7 @@ class MindmeistersController < ApplicationController
   def mindmeister_top
   end
 
+
   def mindmeister_map
   end
 
