@@ -1,13 +1,13 @@
 RedMeister::Application.routes.draw do
-  get "welcomes/gate"
-  root :to => "welcomes#gate"
+  get "welcomes/index"
+  root :to => "welcomes#index"
 
+  match "/gate" => "welcomes#gate", :as => :gate
   match "/signUpPage" => "welcomes#signUpPage", :as => :signUpPage
   match "/signUp" => "welcomes#signUp", :as => :signUp
   match "/setting" => "welcomes#setting", :as => :setting
   match "/gate" => "welcomes#gate", :as => :gate
   match "/redmeisterLogin" => "welcomes#redmeisterLogin", :as => :redmeisterLogin
-  match "/index" => "welcomes#index", :as => :index
   match "/inputInfo" => "redmines#inputInfo", :as => :inputInfo
   match "/getProjects" => "redmines#getProjects", :as => :getProjects
   match "/getIssues" => "redmines#getIssues", :as => :getIssues

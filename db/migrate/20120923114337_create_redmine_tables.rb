@@ -8,6 +8,6 @@ class CreateRedmineTables < ActiveRecord::Migration
       t.timestamps
     end
 
-    add_index :Id_roots, [ :id, :project_id ], unique: true
+#    add_index :Id_roots, [ :id, :project_id ], unique: true
   end
 end

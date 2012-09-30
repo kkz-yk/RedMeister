@@ -26,8 +26,8 @@ class WelcomesController < ApplicationController
       if exist_user
         redirect_to "/signUpPage", :alert => "User Name '#{user_name}' is already exists."
       else
-        user = Info.create(:user_name_d => user_name, :password_d => password)
-        redirect_to "/index"
+        session["redmeister_user"] = Info.create(:user_name_d => user_name, :password_d => password)
+        redirect_to root_path
       end
     else
       redirect_to "/signUpPage", :alert => "Sorry, Password do not match."
@@ -39,14 +39,14 @@ class WelcomesController < ApplicationController
     user_name = params[:text_field][:user_name]
     password = params[:text_field][:password]
 
-    user = Info.find_by_user_name_d_and_password_d(user_name, password)
+    session["redmeister_user"] = Info.find_by_user_name_d_and_password_d(user_name, password)
 
-    if user
-      session["user_id"] = user.id
-      redirect_to "/index"
+    if session["redmeister_user"]
+      session["user_id"] = session["redmeister_user"].id
+      redirect_to root_path
     else
       session["user_id"] = nil
-      redirect_to root_path, :alert => "Invalid login. Please try again."
+      redirect_to "/gate", :alert => "Invalid login. Please try again."
     end
   end
 

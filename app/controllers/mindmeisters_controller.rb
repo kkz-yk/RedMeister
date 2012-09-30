@@ -30,7 +30,7 @@ class MindmeistersController < ApplicationController
       session["auth_token"] = getToken(frob)
     end
 
-    redirect_to root_path
+    redirect_to "/setting"
   end
 
 

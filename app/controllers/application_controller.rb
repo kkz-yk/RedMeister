@@ -23,12 +23,13 @@ class ApplicationController < ActionController::Base
 
   def destroy
     reset_session
-    redirect_to root_path
+    redirect_to "/gate"
   end
 
   def md5Converter(url)
     str = url.clone
 
+    str.slice!("http://www.mindmeister.com/services/auth/?")
     str.slice!("http://www.mindmeister.com/services/rest?")
     str.delete!("=")
     str.delete!("&")

@@ -2,27 +2,6 @@
 <h1>Redmeister Top</h1>
 <br><br>
 
-<h2>- Mindmeister -</h2>
-<% if session["auth_token"] == nil %>
-<%= form_tag ({:controller => 'mindmeisters', :action => :logIn}) do -%>
-<%= submit_tag 'Mindmeister Login' %>
-<% end  -%>
-<% else %>
-Mindmeisterで認証ok
-<br><br>
-<% end %>
-<br>
-<br>
-
-<h2>- Redmine -</h2>
-Redmine Server URL<br>
-[ <%= session["r_url"] %> ]<br><br>
-Redmine User Name<br>
-[ <%= session["r_user_name"] %> ]
-
-
-
-<br><br>
 <h3><%= link_to "Redmine", "/getProjects" %></h3>
 <h3><%= link_to "Mindmeister", "/mindmeister_top" %></h3>
 <br><br>
@@ -30,5 +9,5 @@ Redmine User Name<br>
 <h3><%= link_to "Setting", "/setting" %></h3>
 
 <%= form_tag ({:controller => 'redmines', :action => :destroy}) do -%>
-<%= submit_tag 'Session Destroy' %>
+<%= submit_tag 'Logout' %>
 <% end -%>

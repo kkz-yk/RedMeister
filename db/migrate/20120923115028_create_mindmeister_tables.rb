@@ -8,6 +8,6 @@ class CreateMindmeisterTables < ActiveRecord::Migration
       t.timestamps
     end
 
-    add_index :id_roots, [ :id, :map_id ], unique: true
+#    add_index :id_roots, [ :id, :map_id ], unique: true
   end
 end

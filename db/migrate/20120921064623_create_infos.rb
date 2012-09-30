@@ -6,5 +6,8 @@ class CreateInfos < ActiveRecord::Migration
 
       t.timestamps
     end
+
+#    add_index :id_root, [ :user_name_d ], unique: true
+
   end
 end

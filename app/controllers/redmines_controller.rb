@@ -9,22 +9,27 @@ class RedminesController < ApplicationController
   $api_secret = RedMeister::Application.config.api_secret
 
   def inputInfo
-    if ((params[:text_field][:r_user_name] != "") && (params[:text_field][:r_password] != "") &&  (params[:text_field][:r_url] != ""))
-      session["r_user_name"] = params[:text_field][:r_user_name]
-      session["r_password"] = params[:text_field][:r_password]
-      session["r_url"] = params[:text_field][:r_url]
-    end
+    if ((params[:text_field][:redmine_user_name] != "") && (params[:text_field][:redmine_password] != "") &&  (params[:text_field][:redmine_url] != ""))
+      session["redmine_user_name"] = params[:text_field][:redmine_user_name]
+      session["redmine_password"] = params[:text_field][:redmine_password]
+      session["redmine_url"] = params[:text_field][:redmine_url]
 
-    redirect_to root_path
+
+      IdRoot.create(:user_name_d => session["redmeister_user"].user_name_d,  :redmine_url => session["redmine_url"], :redmine_user_name => session["redmine_user"], :redmine_password => session["redmine_password"])
+
+      redirect_to root_path
+    else
+      redirect_to "/setting"
+    end
   end
 
 
   def getProjects
-    if (session["r_user_name"] == nil) || (session["r_password"] == nil) ||  (session["r_url"] == nil)
+    if (session["redmine_user_name"] == nil) || (session["redmine_password"] == nil) ||  (session["redmine_url"] == nil)
       redirect_to root_path
     else
       # Acquire Redmine Projects
-      url_union = session["r_url"] + "/projects.xml?"
+      url_union = session["redmine_url"] + "/projects.xml?"
       projects_xml = getXML(url_union)
 
       array = Array.new
