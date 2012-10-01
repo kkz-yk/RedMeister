@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+1;2c# -*- coding: utf-8 -*-
 require 'open-uri'
 require 'active_support/core_ext'
 require 'digest/md5'

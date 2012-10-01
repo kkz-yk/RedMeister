@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120923115028) do
+ActiveRecord::Schema.define(:version => 20121001044644) do
 
   create_table "id_roots", :force => true do |t|
     t.string   "user_name_d"
@@ -32,7 +32,15 @@ ActiveRecord::Schema.define(:version => 20120923115028) do
   create_table "mindmeister_tables", :force => true do |t|
     t.integer  "map_id",     :null => false
     t.integer  "idea_id",    :null => false
+    t.integer  "parent_id",  :null => false
     t.string   "title",      :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "redmeister_relationships", :force => true do |t|
+    t.integer  "project_id"
+    t.integer  "map_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
@@ -40,6 +48,7 @@ ActiveRecord::Schema.define(:version => 20120923115028) do
   create_table "redmine_tables", :force => true do |t|
     t.integer  "project_id", :null => false
     t.integer  "issue_id",   :null => false
+    t.integer  "parent_id",  :null => false
     t.string   "subject",    :null => false
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false

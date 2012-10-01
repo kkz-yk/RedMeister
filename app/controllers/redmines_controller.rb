@@ -14,8 +14,7 @@ class RedminesController < ApplicationController
       session["redmine_password"] = params[:text_field][:redmine_password]
       session["redmine_url"] = params[:text_field][:redmine_url]
 
-
-      IdRoot.create(:user_name_d => session["redmeister_user"].user_name_d,  :redmine_url => session["redmine_url"], :redmine_user_name => session["redmine_user"], :redmine_password => session["redmine_password"])
+      IdRoot.create(:user_name_d => session["redmeister_user"].user_name_d, :redmine_url => session["redmine_url"], :redmine_user_name => session["redmine_user"], :redmine_password => session["redmine_password"])
 
       redirect_to root_path
     else
@@ -29,7 +28,10 @@ class RedminesController < ApplicationController
       redirect_to root_path
     else
       # Acquire Redmine Projects
+
+      puts session["redmine_url"]
       url_union = session["redmine_url"] + "/projects.xml?"
+      puts url_union
       projects_xml = getXML(url_union)
 
       array = Array.new
@@ -43,12 +45,19 @@ class RedminesController < ApplicationController
     end # if(session["r_user_name]" ~
   end
 
-
+  
   def getIssues
+    session["auth_token"] = "Xmm2zR6JBBW1JhBwKaL7"
+    # session["r_url"] = "http://redmine.ie.u-ryukyu.ac.jp/"
     session["project_name"] = params[:project_name]
     project_id = params[:project_id]
-    url_union = session["r_url"] + "/projects/" + project_id +  "/issues.xml"
+    
+    url_union = session["redmine_url"] + "/projects/" + project_id +  "/issues.xml?sort=id&status_id=*&limit=100"    
     issues_xml = getXML(url_union)
+    
+    url = session["redmine_url"] + "/projects/" + project_id +  ".xml"
+    project_xml = getXML(url)
+    session["project_id"] = project_xml["project"]["id"]
 
     array = Array.new
     issues_xml["issues"].each{ |p|
@@ -58,35 +67,91 @@ class RedminesController < ApplicationController
       if p["parent"]
         data["parent"] = p["parent"]["id"].to_i
       else
-        data["parent"] = nil
+        data["parent"] = 0
       end
 
       array.push(data)
     }
+
     @issues = array
     session["issues"] = @issues
+    postToMindmeister(array)
+  end
+  
+
+  def postToMindmeister(array)
+    map = RedmeisterRelationship.find_by_project_id(session["project_id"])
+    if map == nil
+      addMap
+    else
+      session["map_id"] = map.map_id
+    end
+
+    array.each{ |array_tmp|
+      issue = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp['id'])
+      if issue == nil
+        if array_tmp['parent'] != 0
+          search_parent(array, array_tmp)
+        else
+          insertIdeas(session["map_id"], array_tmp)
+        end
+      else
+        if issue.subject != array_tmp['subject']
+          updateTitle(array_tmp)
+        elsif issue.parent_id != array_tmp['parent']
+          updateParent(array_tmp)
+        else
+          puts "No change"
+        end
+      end
+    }
+  end
+
+  
+  def search_parent(array, array_tmp)
+    issue = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp['parent'])
+    if issue == nil
+      array.each{ |p|
+        if p['id'] == array_tmp['parent']
+          if p['parent'] == 0
+            insertIdeas(session["map_id"], array_tmp)
+          else
+            search_parent(array, p)
+            issue = RedmineTable.find_by_project_id_and_issue_id(session["project_id"],array_tmp['parent'])
+            record = MindmeisterTable.find_by_id(issue.id)
+            insertIdeas(record.idea_id, array_tmp)
+          end
+          break
+        end
+      }
+    else
+      record = MindmeisterTable.find_by_id(issue.id)
+      insertIdeas(record.idea_id, array_tmp)
+    end
   end
 
 
-  def postToMindmeister
-    array = session["issues"]
+  def updateTitle(array_tmp)
+    issue = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp['id'])
+    record = MindmeisterTable.find_by_id(issue.id)
+    changeIdeas(record.idea_id, array_tmp["subject"])
+    issue.update_attribute(:subject, array_tmp["subject"])
+    record.update_attribute(:title, array_tmp["subject"])
+    puts "Update title of idea"
+  end
 
-    mindmeister_map = addMap
-    publishMap(mindmeister_map["id"])
-    changeIdeas(mindmeister_map["id"], session["project_name"])
+  
+  def updateParent(array_tmp)
+    issue = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp['id'])
+    record = MindmeisterTable.find_by_id(issue.id)
 
-    array.each{ |array_tmp|
-      puts array_tmp
-      url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&map_id=#{mindmeister_map["id"]}&method=mm.ideas.insert&parent_id=#{mindmeister_map["id"]}&response_format=xml&title=#{array_tmp["subject"]}&x_pos=200&y_pos=0"
-
-      api_sig = md5Converter(url)
-      _url = url + "&api_sig=" + api_sig
-
-      uri = URI.escape(_url)
-      getXML(uri)
-    }
-
-    redirect_to root_path
+    update = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp["parent"])
+    update_record = MindmeisterTable.find_by_id(update.id)
+    
+    moveIdeas(record.idea_id, update_record.idea_id)
+    issue.update_attribute(:parent_id, array_tmp["parent"])
+    record.update_attribute(:parent_id, update_record.idea_id)
+    puts "Update parent of idea"    
   end
 
 end

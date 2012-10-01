@@ -3,6 +3,7 @@ class CreateRedmineTables < ActiveRecord::Migration
     create_table :redmine_tables do |t|
       t.integer :project_id, null: false
       t.integer :issue_id, null: false
+      t.integer :parent_id, null: false
       t.string :subject, null: false
 
       t.timestamps

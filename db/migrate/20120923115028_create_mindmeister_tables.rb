@@ -3,6 +3,7 @@ class CreateMindmeisterTables < ActiveRecord::Migration
     create_table :mindmeister_tables do |t|
      t.integer :map_id, null: false
       t.integer :idea_id, null: false
+      t.integer :parent_id, null: false
       t.string :title, null: false
 
       t.timestamps
