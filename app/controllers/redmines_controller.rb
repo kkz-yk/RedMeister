@@ -47,7 +47,7 @@ class RedminesController < ApplicationController
   def getIssues
     session["project_name"] = params[:project_name]
     project_id = params[:project_id]
-    url_union = session["r_url"] + "/projects/" + project_id +  "/issues.xml"
+    url_union = session["redmine_url"] + "/projects/" + project_id +  "/issues.xml"
     issues_xml = getXML(url_union)
 
     array = Array.new
