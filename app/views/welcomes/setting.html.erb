@@ -3,7 +3,7 @@
 
 <h2>- Mindmeister -</h2>
 <% if session["auth_token"] == nil %>
-<%= form_tag ({:controller => 'mindmeisters', :action => :logIn}) do -%>
+<%= form_tag ({:controller => 'application', :action => :logIn}) do -%>
 <%= submit_tag 'Login' %>
 <% end -%>
 
