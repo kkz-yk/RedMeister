@@ -99,12 +99,6 @@ class RedminesController < ApplicationController
         if issue.subject != array_tmp['subject'] || issue.parent_id != array_tmp['parent']
           updateMindmeister(array_tmp)
         end
-        # if issue.subject != array_tmp['subject'] ||
-        #   updateTitleOfMindmeister(array_tmp)
-        # end
-        # if issue.parent_id != array_tmp['parent']
-        #   updateParentOfMindmeister(array_tmp)
-        # end
       end
     }
   end

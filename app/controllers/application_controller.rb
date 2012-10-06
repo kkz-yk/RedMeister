@@ -300,7 +300,7 @@ class ApplicationController < ActionController::Base
 
   end
 
-
+  
   def diffToMindmeister()
     Issue.site = session["redmine_url"] + "/projects/pro3-2012-redmine"
     Issue.user = session["redmine_user_name"]
@@ -359,8 +359,8 @@ class ApplicationController < ActionController::Base
 
     updateRedmine(record.issue_id, update_record.issue_id, array_tmp["title"])
 
-    idea.attributes(:parent_id => array_tmp["parent"], :title => array_tmp["title"])
-    record.attribute(:parent_id => update_record.issue_id, :subject => array_tmp["title"])
+    idea.update_attributes(:parent_id => array_tmp["parent"], :title => array_tmp["title"])
+    record.update_attributes(:parent_id => update_record.issue_id, :subject => array_tmp["title"])
   end
 
 
@@ -368,8 +368,7 @@ class ApplicationController < ActionController::Base
     issue = Issue.find(issue_id)
     issue.subject = subject
     issue.parent_issue_id = parent_id
-    issue.save
-
+    issue.save    
   end
 
 
@@ -384,7 +383,6 @@ class ApplicationController < ActionController::Base
     else
       puts issue.errors.full_messages
     end
-
   end
 
 
