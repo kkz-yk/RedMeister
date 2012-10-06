@@ -5,6 +5,7 @@ require 'uri'
 
 class RedminesController < ApplicationController
 
+  # Mindmeister's APIkey and APIsecret
   $api_key = RedMeister::Application.config.api_key
   $api_secret = RedMeister::Application.config.api_secret
 
@@ -42,15 +43,15 @@ class RedminesController < ApplicationController
     end
   end
 
-  
+
   def getIssues
-    
+
     session["project_name"] = params[:project_name]
     project_id = params[:project_id]
-    
-    url_union = session["redmine_url"] + "/projects/" + project_id +  "/issues.xml?sort=id&status_id=*&limit=100"    
+
+    url_union = session["redmine_url"] + "/projects/" + project_id +  "/issues.xml?sort=id&status_id=*&limit=100"
     issues_xml = getXML(url_union)
-    
+
     url = session["redmine_url"] + "/projects/" + project_id +  ".xml"
     project_xml = getXML(url)
     session["project_id"] = project_xml["project"]["id"]
@@ -77,14 +78,14 @@ class RedminesController < ApplicationController
 
   def postToMindmeister(array)
     map = RedmeisterRelationship.find_by_project_id(session["project_id"])
-    
+
     if map == nil
       addMap
     else
       session["map_id"] = map.map_id
       getMap
     end
-    
+
     array.each{ |array_tmp|
       issue = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp['id'])
       if issue == nil
@@ -103,7 +104,7 @@ class RedminesController < ApplicationController
       end
     }
   end
-  
+
   def search_parent(array, array_tmp)
     issue = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp['parent'])
     if issue == nil
@@ -136,26 +137,26 @@ class RedminesController < ApplicationController
     puts "Update title of idea"
   end
 
-  
+
   def updateParentOfMindmeister(array_tmp)
     issue = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp['id'])
     record = MindmeisterTable.find_by_id(issue.id)
 
     update = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp["parent"])
     update_record = MindmeisterTable.find_by_id(update.id)
-    
+
     moveIdeas(record.idea_id, update_record.idea_id)
     issue.update_attribute(:parent_id, array_tmp["parent"])
     record.update_attribute(:parent_id, update_record.idea_id)
-    puts "Update parent of idea"    
+    puts "Update parent of idea"
   end
-  
+
 
   def diffToMindmeister()
     response = getMap
 
     response.each{ |array_tmp|
-      if array_tmp['parent'] != nil        
+      if array_tmp['parent'] != nil
         idea = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp['id'])
         if idea == nil
           if array_tmp['parent'] != session["map_id"]
@@ -215,11 +216,11 @@ class RedminesController < ApplicationController
     update = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp["parent"])
 
     update_record = RedmineTable.find_by_id(update.id)
-    
+
     parentOfRedmine(record.issue_id, update_record.issue_id)
     idea.update_attribute(:parent_id, array_tmp["parent"])
     record.update_attribute(:parent_id, update_record.issue_id)
-    puts "Update parent of idea"    
+    puts "Update parent of idea"
   end
 
 end

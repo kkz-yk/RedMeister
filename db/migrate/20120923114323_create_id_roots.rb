@@ -1,7 +1,7 @@
 class CreateIdRoots < ActiveRecord::Migration
   def change
-    create_table :id_roots do |t|
-      t.string :user_name_d
+    create_table :id_roots, :primary_key => "user_name_d" do |t|
+#      t.string :user_name_d
       t.string :redmine_url
       t.string :redmine_user_name
       t.string :redmine_password

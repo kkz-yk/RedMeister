@@ -37,11 +37,8 @@ class MindmeistersController < ApplicationController
   def getFrob
     url = "http://www.mindmeister.com/services/rest?api_key={$api_key}&method=mm.auth.getFrob&response_format=xml"
 
-    api_sig = md5Converter(url)
-    _url = url + "&api_sig=" + api_sig
-
-    xml = getXML(_url)
-    return xml
+    response = getXML(url)
+    return response
   end
 
 
@@ -49,31 +46,25 @@ class MindmeistersController < ApplicationController
     url = "http://www.mindmeister.com/services/auth/?api_key=#{$api_key}&perms=delete"
 
     api_sig = md5Converter(url)
-    _url = url + "&api_sig=" + api_sig
+    url = url + "&api_sig=" + api_sig
 
-    redirect_to _url
+    redirect_to url
   end
 
 
   def getToken(frob)
     url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&frob=#{frob}&method=mm.auth.getToken&response_format=xml"
 
-    api_sig = md5Converter(url)
-    _url = url + "&api_sig=" + api_sig
-
-    xml = getXML(_url)
-    return xml["rsp"]["auth"]["token"]
+    response = getXML(url)
+    return response["rsp"]["auth"]["token"]
   end
 
 
   def checkToken
     url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&method=mm.auth.checkToken&response_format=xml"
 
-    api_sig = md5Converter(url)
-    _url = url + "&api_sig=" + api_sig
-
-    xml = getXML(_url)
-    return xml["rsp"]["stat"]
+    resonse = getXML(url)
+    return response["rsp"]["stat"]
   end
 
 
@@ -82,10 +73,7 @@ class MindmeistersController < ApplicationController
     session["user_name"] = params[:text_field][:user_name]
     url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&method=mm.maps.getChannel&response_format=xml&user=#{session["user_name"]}"
 
-    api_sig = md5Converter(url)
-    _url = url + "&api_sig=" + api_sig
-
-    maps_xml = getXML(_url)
+    maps_xml = getXML(url)
 
     array = Array.new
     begin
@@ -112,10 +100,7 @@ class MindmeistersController < ApplicationController
     session["map_id"] = params[:id]
     url = "http://www.mindmeister.com/services/rest?api_key=#{$api_key}&auth_token=#{session["auth_token"]}&map_id=#{session["map_id"]}&method=mm.maps.getMap&response_format=xml"
 
-    api_sig = md5Converter(url)
-    _url = url + "&api_sig=" + api_sig
-
-    map_xml = getXML(_url)
+    map_xml = getXML(url)
 
     array = Array.new
     begin
@@ -225,4 +210,3 @@ class Issue < ActiveResource::Base
   self.user = $redmine_user
   self.password = $redmine_password
 end
-
