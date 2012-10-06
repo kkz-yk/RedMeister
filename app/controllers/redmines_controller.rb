@@ -5,10 +5,6 @@ require 'uri'
 
 class RedminesController < ApplicationController
 
-  # Mindmeister's APIkey and APIsecret
-  $api_key = RedMeister::Application.config.api_key
-  $api_secret = RedMeister::Application.config.api_secret
-
   def inputInfo
     if ((params[:text_field][:redmine_user_name] != "") && (params[:text_field][:redmine_password] != "") &&  (params[:text_field][:redmine_url] != ""))
       session["redmine_user_name"] = params[:text_field][:redmine_user_name]
@@ -45,7 +41,6 @@ class RedminesController < ApplicationController
 
 
   def getIssues
-
     session["project_name"] = params[:project_name]
     project_id = params[:project_id]
 
