@@ -47,7 +47,7 @@ class RedminesController < ApplicationController
     
     session["project_name"] = params[:project_name]
     project_id = params[:project_id]
-    
+
     url_union = session["redmine_url"] + "/projects/" + project_id +  "/issues.xml?sort=id&status_id=*&limit=100"    
     issues_xml = getXML(url_union)
     
@@ -72,9 +72,10 @@ class RedminesController < ApplicationController
     @issues = array
     session["issues"] = @issues
     postToMindmeister(array)
-    diffToMindmeister()
+    diffToMindmeister
   end
 
+  
   def postToMindmeister(array)
     map = RedmeisterRelationship.find_by_project_id(session["project_id"])
     
@@ -103,6 +104,7 @@ class RedminesController < ApplicationController
       end
     }
   end
+
   
   def search_parent(array, array_tmp)
     issue = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp['parent'])
@@ -133,7 +135,6 @@ class RedminesController < ApplicationController
     changeIdeas(record.idea_id, array_tmp["subject"])
     issue.update_attribute(:subject, array_tmp["subject"])
     record.update_attribute(:title, array_tmp["subject"])
-    puts "Update title of idea"
   end
 
   
@@ -142,84 +143,13 @@ class RedminesController < ApplicationController
     record = MindmeisterTable.find_by_id(issue.id)
 
     update = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp["parent"])
-    update_record = MindmeisterTable.find_by_id(update.id)
+    update_record = MindmeisterTable.find_by_id(update.i
+d)
     
     moveIdeas(record.idea_id, update_record.idea_id)
     issue.update_attribute(:parent_id, array_tmp["parent"])
     record.update_attribute(:parent_id, update_record.idea_id)
-    puts "Update parent of idea"    
-  end
-  
-
-  def diffToMindmeister()
-    response = getMap
-
-    response.each{ |array_tmp|
-      if array_tmp['parent'] != nil        
-        idea = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp['id'])
-        if idea == nil
-          if array_tmp['parent'] != session["map_id"]
-            searchParentOfIdea(response, array_tmp)
-          else
-            postToRedmine(parent_id, array_tmp)
-          end
-        else
-          if idea.title != array_tmp['title']
-            updateTitleOfRedmine(array_tmp)
-          end
-          if idea.parent_id.to_i != array_tmp['parent'].to_i
-            updateParentOfRedmine(array_tmp)
-          end
-        end
-      end
-    }
   end
 
-
-  def searchParentOfIdea(array, array_tmp)
-    idea = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp['parent'])
-    if idea == nil
-      array.each{ |p|
-        if p['id'] == array_tmp['parent']
-          if p['parent'] == session["map_id"]
-            postToRedmine("nil",array_tmp)
-          else
-            searchParentOfIdea(array, p)
-            idea = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"],array_tmp['parent'])
-            record = RedmineTable.find_by_id(idea.id)
-            postToRedmine(record.issue_id, array_tmp)
-          end
-          break
-        end
-      }
-    else
-      record = RedmineTable.find_by_id(idea.id)
-      postToRedmine(record.issue_id, array_tmp)
-    end
-  end
-
-
-  def updateTitleOfRedmine(array_tmp)
-    idea = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp['id'])
-    record = RedmineTable.find_by_id(idea.id)
-    subjectOfRedmine(record.issue_id, array_tmp["title"])
-    idea.update_attribute(:title, array_tmp["title"])
-    record.update_attribute(:subject, array_tmp["title"])
-  end
-
-
-  def updateParentOfRedmine(array_tmp)
-    idea = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp['id'])
-    record = RedmineTable.find_by_id(idea.id)
-
-    update = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp["parent"])
-
-    update_record = RedmineTable.find_by_id(update.id)
-    
-    parentOfRedmine(record.issue_id, update_record.issue_id)
-    idea.update_attribute(:parent_id, array_tmp["parent"])
-    record.update_attribute(:parent_id, update_record.issue_id)
-    puts "Update parent of idea"    
-  end
-
+ 
 end

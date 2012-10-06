@@ -98,12 +98,9 @@ class ApplicationController < ActionController::Base
     response = getXML(uri)
 
     if response["rsp"]["stat"] == "fail"
-      # delete clumn
-
       RedmeisterRelationship.delete_all(:map_id => session["map_id"])
       RedmineTable.delete_all(:project_id => session["project_id"])
       MindmeisterTable.delete_all(:map_id => session["map_id"])
-      puts "response = fail"
       addMap
       return nil
     end
@@ -121,61 +118,108 @@ class ApplicationController < ActionController::Base
     
     response = getXML(uri)
     session["response"] = response["rsp"]["id"].to_i
-    puts "POST from Redmine to Mindmeister"
 
-    RedmineTable.create(:project_id => session["project_id"], :issue_id => array_tmp["id"], :parent_id => array_tmp["parent"], :subject => array_tmp["subject"])
-    MindmeisterTable.create(:map_id => session["map_id"], :idea_id => session["response"], :parent_id => parent_id, :title => array_tmp["subject"])
-
+    createRecord(array_tmp["id"], array_tmp["parent"], session["response"], parent_id, array_tmp["subject"])
+    
   end
 
 
-  def parentOfRedmine(issue_id, parent_id)
-    puts "Update parent of Redmine"
-    
+  def diffToMindmeister
+
     Issue.site = session["redmine_url"] + "/projects/pro3-2012-redmine"  
     Issue.user = session["redmine_user_name"]
     Issue.password = session["redmine_password"]
 
-    issue = Issue.find(issue_id)
-    issue.parent_issue_id = parent_id
-    issue.save
+    response = getMap
+
+    response.each{ |array_tmp|
+      if array_tmp['parent'] != nil        
+        idea = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp['id'])
+        if idea == nil
+          if array_tmp['parent'] != session["map_id"]
+            searchParentOfIdea(response, array_tmp)
+          else
+            postToRedmine(parent_id, array_tmp)
+          end
+        else
+          if idea.title != array_tmp['title'] || idea.parent_id.to_i != array_tmp['parent'].to_i
+            updateAllRedmine(array_tmp)
+          end
+        end
+      end
+    }
   end
 
 
-  def subjectOfRedmine(issue_id, subject)
-    puts "Update subject of Redmine"
-    Issue.site = session["redmine_url"] + "/projects/pro3-2012-redmine"  
-    Issue.user = session["redmine_user_name"]
-    Issue.password = session["redmine_password"]
-    
-    issue = Issue.find(issue_id)
-    issue.subject = subject
-    issue.save
+  def searchParentOfIdea(array, array_tmp)
+    idea = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp['parent'])
+    if idea == nil
+      array.each{ |p|
+        if p['id'] == array_tmp['parent']
+          if p['parent'] == session["map_id"]
+            postToRedmine("nil",array_tmp)
+          else
+            searchParentOfIdea(array, p)
+            idea = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"],array_tmp['parent'])
+            record = RedmineTable.find_by_id(idea.id)
+            postToRedmine(record.issue_id, array_tmp)
+          end
+          break
+        end
+      }
+    else
+      record = RedmineTable.find_by_id(idea.id)
+      postToRedmine(record.issue_id, array_tmp)
+    end
   end
 
   
-  def postToRedmine(parent_id, array_tmp)
-    Issue.site = session["redmine_url"] + "/projects/pro3-2012-redmine"  
-    Issue.user = session["redmine_user_name"]
-    Issue.password = session["redmine_password"]
+  def updateAllRedmine(array_tmp)
+    idea = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp['id'])
+    record = RedmineTable.find_by_id(idea.id)
 
+    update = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp["parent"])
+    update_record = RedmineTable.find_by_id(update.id)
+    
+    updateRedmine(record.issue_id, update_record.issue_id, array_tmp["title"])
+    
+    idea.update_attribute(:title, array_tmp["title"])
+    record.update_attribute(:subject, array_tmp["title"])
+  end
+
+
+  def updateRedmine(issue_id, parent_id, subject)
+    issue = Issue.find(issue_id)
+    issue.subject = subject
+    issue.parent_issue_id = parent_id
+    issue.save
+    
+  end
+  
+  
+  def postToRedmine(parent_id, array_tmp)
     issue = Issue.new(
                       :parent_issue_id => parent_id,
                       :subject => array_tmp["title"],
                       :project_id => session["project_id"]
                       )
-
-    if issue.save
-      puts "Post to Redmine"
-      RedmineTable.create(:project_id => session["project_id"], :issue_id => issue.id, :parent_id => parent_id, :subject => array_tmp["title"])
-      MindmeisterTable.create(:map_id => session["map_id"], :idea_id => array_tmp["id"], :parent_id => array_tmp["parent"], :title => array_tmp["title"])
+    if issue.save      
+      createRecord(issue.id, parent_id, array_tmp["id"], array_tmp["parent"], array_tmp["title"])
     else
       puts issue.errors.full_messages
     end
     
   end
 
+  
+  def createRecord(issue_id, issue_parent, idea_id, idea_parent, title)
+    RedmineTable.create(:project_id => session["project_id"], :issue_id => issue_id, :parent_id => issue_parent, :subject => title)
+    MindmeisterTable.create(:map_id => session["map_id"], :idea_id => idea_id, :parent_id => idea_parent, :title => title)    
+  end
+  
+
 end
+
 
 class Issue < ActiveResource::Base
   self.site = nil
