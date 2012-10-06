@@ -76,7 +76,7 @@ class RedminesController < ApplicationController
     diffToMindmeister
   end
 
-  
+
   def postToMindmeister(array)
     map = RedmeisterRelationship.find_by_project_id(session["project_id"])
 
@@ -141,5 +141,5 @@ class RedminesController < ApplicationController
     issue.update_attributes(:parent_id => array_tmp["parent"], :subject => array_tmp["subject"])
     record.update_attributes(:parent_id => update_record.idea_id, :title => array_tmp["subject"])
   end  
- 
+
 end

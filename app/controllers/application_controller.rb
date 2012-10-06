@@ -108,7 +108,7 @@ class ApplicationController < ActionController::Base
     session["response"] = response["rsp"]["id"].to_i
 
     createRecord(array_tmp["id"], array_tmp["parent"], session["response"], parent_id, array_tmp["subject"])
-    
+
   end
 
   
@@ -120,7 +120,7 @@ class ApplicationController < ActionController::Base
     response = getMap
 
     response.each{ |array_tmp|
-      if array_tmp['parent'] != nil        
+      if array_tmp['parent'] != nil
         idea = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp['id'])
         if idea == nil
           if array_tmp['parent'] != session["map_id"]
@@ -160,16 +160,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  
+
   def updateAllRedmine(array_tmp)
     idea = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp['id'])
     record = RedmineTable.find_by_id(idea.id)
 
     update = MindmeisterTable.find_by_map_id_and_idea_id(session["map_id"], array_tmp["parent"])
     update_record = RedmineTable.find_by_id(update.id)
-    
+
     updateRedmine(record.issue_id, update_record.issue_id, array_tmp["title"])
-    
+
     idea.update_attributes(:parent_id => array_tmp["parent"], :title => array_tmp["title"])
     record.update_attributes(:parent_id => update_record.issue_id, :subject => array_tmp["title"])
   end
@@ -181,27 +181,27 @@ class ApplicationController < ActionController::Base
     issue.parent_issue_id = parent_id
     issue.save    
   end
-  
-  
+
+
   def postToRedmine(parent_id, array_tmp)
     issue = Issue.new(
                       :parent_issue_id => parent_id,
                       :subject => array_tmp["title"],
                       :project_id => session["project_id"]
                       )
-    if issue.save      
+    if issue.save
       createRecord(issue.id, parent_id, array_tmp["id"], array_tmp["parent"], array_tmp["title"])
     else
       puts issue.errors.full_messages
     end
   end
 
-  
+
   def createRecord(issue_id, issue_parent, idea_id, idea_parent, title)
     RedmineTable.create(:project_id => session["project_id"], :issue_id => issue_id, :parent_id => issue_parent, :subject => title)
-    MindmeisterTable.create(:map_id => session["map_id"], :idea_id => idea_id, :parent_id => idea_parent, :title => title)    
+    MindmeisterTable.create(:map_id => session["map_id"], :idea_id => idea_id, :parent_id => idea_parent, :title => title)
   end
-  
+
 
 end
 

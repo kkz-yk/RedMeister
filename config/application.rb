@@ -12,8 +12,11 @@ end
 module RedMeister
   class Application < Rails::Application
 
-    config.api_key = "c5f3b0680ba01894d2bf524e13ee1b46"
-    config.api_secret = "f6b40ef73b79b126"
+#    config.api_key = "c5f3b0680ba01894d2bf524e13ee1b46"
+#    config.api_secret = "f6b40ef73b79b126"
+    config.api_key = "9e3d04f12d56b1400337ca02cbeb8ff5"
+    config.api_secret = "dcf630941b061ed0"
+
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

@@ -155,8 +155,8 @@ class MindmeistersController < ApplicationController
 
 
     # Compare subject of Redmine with title of Mindmeister
-    $r_user = session["r_user"]
-    $r_password = session["r_password"]
+    $redmine_user = session["redmine_user"]
+    $redmine_password = session["redmine_password"]
     issues = Issue.find(:all)
 
     array.each{ |p1|
