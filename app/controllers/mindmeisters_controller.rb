@@ -1,4 +1,4 @@
-1;2c# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 require 'open-uri'
 require 'active_support/core_ext'
 require 'digest/md5'
@@ -201,7 +201,7 @@ class MindmeistersController < ApplicationController
                           :parent_issue_id => p1['parent_issue_id'],
                           :subject => p1['title'],
                           #:project_id => 56
-                          :project_id => 57
+                          :project_id => 61
                           )
         if issue.save
           puts issue.id
@@ -214,15 +214,15 @@ class MindmeistersController < ApplicationController
 
     redirect_to root_path
   end
-
 end
 
 
 # REDMINE REST API
 class Issue < ActiveResource::Base
 #  self.site = 'http://redmine.ie.u-ryukyu.ac.jp/projects/pro3-2012-redmine'
-  self.site = 'http://redmine.ie.u-ryukyu.ac.jp/projects/pro3-test'
+  self.site = 'http://redmine.ie.u-ryukyu.ac.jp/projects/pro3-test-test'
   self.format = :xml
-  self.user = $r_user
-  self.password = $r_password
+  self.user = $redmine_user
+  self.password = $redmine_password
 end
+

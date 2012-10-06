@@ -22,7 +22,9 @@ RedMeister::Application.routes.draw do
   match "/getToken" => "mindmeisters#getToken", :as => :getToken
   match "/getChannel" => "mindmeisters#getChannel", :as => :getChannel
   match "/getMap" => "mindmeisters#getMap", :as => :getMap
-  match "/postToRedmine" => "mindmeisters#postToRedmine", :as => :postToRedmine
+#  match "/postToRedmine" => "mindmeisters#postToRedmine", :as => :postToRedmine
+  match "/postToRedmine" => "redmines#postToRedmine", :as => :postToRedmine
+  #  match "/postToRedmine" => "application#postToRedmine", :as => :postToRedmine
   match "/mindmeister_map" => "mindmeisters#mindmeister_map", :as => :mindmeister_map
 
 end
