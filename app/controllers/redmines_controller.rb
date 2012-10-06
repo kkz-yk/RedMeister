@@ -99,12 +99,6 @@ class RedminesController < ApplicationController
         if issue.subject != array_tmp['subject'] || issue.parent_id != array_tmp['parent']
           updateMindmeister(array_tmp)
         end        
-        # if issue.subject != array_tmp['subject'] ||
-        #   updateTitleOfMindmeister(array_tmp)
-        # end
-        # if issue.parent_id != array_tmp['parent']
-        #   updateParentOfMindmeister(array_tmp)
-        # end
       end
     }
   end
@@ -136,37 +130,16 @@ class RedminesController < ApplicationController
   def updateMindmeister(array_tmp)
     issue = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp['id'])
     record = MindmeisterTable.find_by_id(issue.id)
+    update = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp["parent"])
+    update_record = MindmeisterTable.find_by_id(update.id)
     if issue.subject != array_tmp['subject']
       changeIdeas(record.idea_id, array_tmp["subject"])
     end
     if issue.parent_id != array_tmp['parent']
-      update = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp["parent"])
-      update_record = MindmeisterTable.find_by_id(update.id)
       moveIdeas(record.idea_id, update_record.idea_id)
     end
-    issue.attributes(:parent_id => array_tmp["parent"], :subject => array_tmp["subject"])
-    record.attributes(:parent_id => update_record.idea_id, :title => array_tmp["subject"])
-  end
-  # def updateTitleOfMindmeister(array_tmp)
-  #   issue = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp['id'])
-  #   record = MindmeisterTable.find_by_id(issue.id)
-  #   changeIdeas(record.idea_id, array_tmp["subject"])
-  #   issue.update_attribute(:subject, array_tmp["subject"])
-  #   record.update_attribute(:title, array_tmp["subject"])
-  # end
-
-
-  # def updateParentOfMindmeister(array_tmp)
-  #   issue = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp['id'])
-  #   record = MindmeisterTable.find_by_id(issue.id)
-
-  #   update = RedmineTable.find_by_project_id_and_issue_id(session["project_id"], array_tmp["parent"])
-  #   update_record = MindmeisterTable.find_by_id(update.id)
-
-  #   moveIdeas(record.idea_id, update_record.idea_id)
-  #   issue.update_attribute(:parent_id, array_tmp["parent"])
-  #   record.update_attribute(:parent_id, update_record.idea_id)
-  # end
-
+    issue.update_attributes(:parent_id => array_tmp["parent"], :subject => array_tmp["subject"])
+    record.update_attributes(:parent_id => update_record.idea_id, :title => array_tmp["subject"])
+  end  
  
 end
